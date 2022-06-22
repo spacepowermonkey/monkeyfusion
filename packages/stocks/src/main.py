@@ -1,4 +1,9 @@
-import .config as conf
+import argparse
+import time
+
+
+from .config import Config
+from .sources import yahoo
 
 
 
@@ -9,11 +14,11 @@ if __name__=="__main__":
     parser.add_argument("--config", dest="confname", help="config filename")
     args = parser.parse_args()
 
-    config = conf.Config(args.confdir, args.confname)
+    config = Config(args.confdir, args.confname)
 
     # For each spec in the config, load its data and generate images.
     for dataset in config.datasets:
-        spider.connectors.sources[dataset.source].crawl(
+        yahoo.crawl(
             dataset.symbol, dataset.period, dataset.resolution
         )
         time.sleep(1)
