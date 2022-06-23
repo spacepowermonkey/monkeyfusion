@@ -1,1 +1,1 @@
-import .yahoo
+from . import yahoo
