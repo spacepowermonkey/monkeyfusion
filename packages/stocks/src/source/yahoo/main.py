@@ -1,18 +1,31 @@
-import json
+import numpy
 
 
-
-from . import format as Yformat
+from ..stock import Stock
 from . import url as Yurl
 
 
 
 def get(symbol, period, resolution):
     data = Yurl.query_symbol(symbol, period, resolution)
-    chart = Yformat.YahooChart(data)
-    meta = chart.result.meta
-    meta["period"] = meta["range"]
-    meta["resolution"] = meta["dataGranularity"]
 
-    quotes = chart.result.to_quotes()
+    chart = data['chart']
+    error = data['error']
+
+    results = chart['result']
+    assert(len(results) == 1, "Error, unexpected chart results returned from Yahoo!")
+    result = results[0]
+    indicators = result['indicators']
+    quote_data = indicators['quote'][0]
+
+    quotes = Stock(
+        symbol = symbol,
+        period = period,
+        resolution = resolution,
+        highs = numpy.asarray(quote_data['high']),
+        lows = numpy.asarray(quote_data['lows']),
+        opens = numpy.asarray(quote_data['open']),
+        closes = numpy.asarray(quote_data['close']),
+        vols = numpy.asarray(quote_data['volume'])
+    )
     return quotes
