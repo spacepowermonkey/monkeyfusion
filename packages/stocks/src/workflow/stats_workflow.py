@@ -1,0 +1,2 @@
+def apply(data):
+    pass
