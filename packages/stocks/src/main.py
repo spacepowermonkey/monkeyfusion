@@ -1,36 +1,49 @@
+import time
+
+
+
 from .source import yahoo
 
-from .workflow import (
-    generate_page,
-    generate_index_page,
-    stats_workflow,
-    stats_index_workflow
-)
+from .types.index import Index
+from .types.report import Report
+from .types.symbol import Symbol
+
+from .workflow import main as workflow
 
 
 
-def build_report(index_page, stocks_pages):
-    pass
+def main(root, symbols, indexes, scales):
+    report = Report(root, scales)
 
-
-
-def generate_report(symbols:[str], period:str, resolution:str):
-    stocks_data = {}
-    stocks_stats = {}
-    stocks_pages = {}
     for symbol in symbols:
-        stocks_data[symbol] = yahoo.get(symbol, period, resolution)
-        stocks_stats[symbol] = stats_workflow.apply(stocks_data[symbol])
-        stocks_pages[symbol] = generate_page.apply(stocks_data[symbol], stocks_stats[symbol])
+        report.symbols[symbol] = Symbol(symbol, report)
+        for scale in report.scales:
+            time.sleep(1)
+            report.symbols[symbol].snapshots[scale.period] = yahoo.get(symbol, scale)
     
-    stocks_index_stats = stats_index_workflow.apply(stocks_data)
-    stocks_index_page = generate_index_page.apply(stocks_data, stocks_stats)
+    for index in indexes:
+        report.indexes[index[0]] = Index(report, index)
 
-    build_report(stocks_index_page, stocks_pages)
+    workflow.apply(report)
     return
 
 
 
 if __name__ == '__main__':
-    #config stuff
-    generate_report(symbols, period, resolution)
+    symbols = [
+        'AXP', 'AMGN', 'AAPL', 'BA', 'CAT', 'CSCO', 'CVX',
+        'GS', 'HD', 'HON', 'IBM', 'INTC', 'JNJ', 'KO', 'JPM',
+        'MCD', 'MMM', 'MRK', 'MSFT', 'NKE', 'PG', 'TRV', 'UNH',
+        'CRM', 'VZ', 'V', 'WBA', 'WMT', 'DIS', 'DOW'
+    ]
+    scales = [
+        ('5d', '15m'),
+        ('1mo', '30m'),
+        ('1y', '1d')
+        #('5y', '1d')
+    ]
+
+
+    root = '/data'
+
+    main(root, symbols, [('DOW30', symbols)], scales)

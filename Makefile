@@ -4,16 +4,12 @@ clean:
 	- docker images -aq | xargs docker rmi -f
 	- docker volume ls -q | xargs docker volume rm
 	echo "\n\nDESTROYED DOCKER RESOURCES!\n\n"
-	- rm -r ./report/data/*
+	- rm -r ./report/data
 	echo "\n\nDESTROYED EXISTING DATA!\n\n"
 
 
 
-docker-base:
-	cd ./lib && tar -czh * | \
-	docker build -t spacepowermonkey/monkeyfusion -
-
-docker-stocks: docker-base
+docker-stocks:
 	cd ./packages/stocks && tar -czh * | \
 	docker build -t spacepowermonkey/monkeyfusion-stocks -
 
@@ -23,8 +19,9 @@ report: docker-stocks
 
 	docker run --name mf-stocks \
 	--mount type=volume,src=monkeyfusion-data,dst="/data" \
-	--mount type=bind,src=$(PWD)/report/config.json,target=/meta/config.json,readonly \
-	spacepowermonkey/monkeyfusion-stocks --confdir /meta --config config.json
+	spacepowermonkey/monkeyfusion-stocks
+
+	docker cp -a mf-stocks:/data/ ./report/
 
 	echo "\n\n SUCCESS!\n"
 
