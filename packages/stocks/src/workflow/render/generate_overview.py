@@ -29,6 +29,7 @@ def apply(report):
         page += f'[{symbol}](/reports/stocks/symbols/{symbol}) '
     
     page += '\n\n\n'
+    page += '### Credits\n\n'
     page += 'This report generated with [MonkeyFusion](https://www.spacepowermonkey.com/software/monkeyfusion/).\n'
 
 
