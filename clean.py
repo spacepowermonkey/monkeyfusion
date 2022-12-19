@@ -21,7 +21,7 @@ def exec(pkg_path, pkg_name):
         pass
     
     # Remove old report.
-    report_path = f"{pkg_path}/report"
+    report_path = f"{pkg_path}/docs"
     
     shutil.rmtree(report_path)
     os.makedirs(report_path, exist_ok=True)
